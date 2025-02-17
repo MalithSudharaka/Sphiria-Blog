@@ -40,6 +40,27 @@ let CategoriesService = class CategoriesService {
             throw new common_1.BadRequestException('Failed to create category');
         }
     }
+    async addCategoriesToContent(contentId, categoryIds) {
+        const categories = await this.prisma.categories.findMany({
+            where: { id: { in: categoryIds } },
+        });
+        if (categories.length !== categoryIds.length) {
+            throw new common_1.NotFoundException('Some categories not found');
+        }
+        const contentCategoriesData = categoryIds.map((categoryId) => ({
+            contentId,
+            categoryId,
+        }));
+        return this.prisma.contentCategory.createMany({
+            data: contentCategoriesData,
+        });
+    }
+    async getCategoriesForContent(contentId) {
+        return this.prisma.contentCategory.findMany({
+            where: { contentId },
+            include: { category: true },
+        });
+    }
 };
 exports.CategoriesService = CategoriesService;
 exports.CategoriesService = CategoriesService = __decorate([

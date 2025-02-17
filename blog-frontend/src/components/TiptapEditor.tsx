@@ -30,6 +30,8 @@ const TiptapEditor = () => {
 
   const [tags, setTags] = useState<string[]>([]); // State to hold tags
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
 
   
 
@@ -118,27 +120,38 @@ const TiptapEditor = () => {
     setTags(newTags);
   };
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category);
+  const handleCategoryChange = (categories: string[]) => {
+    setSelectedCategories(categories); // Set the selected categories from child
   };
 
   const handleSubmit = async () => {
     if (!editor) return;
-
+  
+    // Get the content from the editor
     const content = editor.getHTML();
-    const payload = { content, tags: selectedTags }; // ✅ Include selectedTags
-
+  
+    // Create the payload including content, tags, and the selected categories
+    const payload = {
+      content,
+      tags: selectedTags,
+      categories: selectedCategories, // Add selected categories to the payload
+    };
+  
     try {
+      // Send the payload to your backend API
       await axios.post("http://localhost:5000/contents", payload, {
         headers: { "Content-Type": "application/json" },
       });
-
+  
       alert("Content saved successfully!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting content:", error);
       alert(error.response?.data?.error || "An error occurred while saving content.");
     }
   };
+  
+  
+  
 
   useEffect(() => {
     return () => {
@@ -154,7 +167,8 @@ const TiptapEditor = () => {
        <TagInput onTagsChange={setSelectedTags} />
 
        {/* Category Input */}
-      <CategoryInput onCategoryChange={handleCategoryChange} />
+       <CategoryInput onCategoriesChange={handleCategoryChange} />
+
 
       {/* ✅ Use the new EditorToolbar component */}
       <EditorToolbar

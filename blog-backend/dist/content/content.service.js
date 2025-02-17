@@ -16,8 +16,13 @@ let ContentService = class ContentService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async saveContent(content, tagNames) {
+    async saveContent(content, tagNames, categoryNames) {
         const tags = await Promise.all(tagNames.map(async (name) => this.prisma.tag.upsert({
+            where: { name },
+            update: {},
+            create: { name },
+        })));
+        const categories = await Promise.all(categoryNames.map(async (name) => this.prisma.categories.upsert({
             where: { name },
             update: {},
             create: { name },
@@ -30,20 +35,27 @@ let ContentService = class ContentService {
                         tag: { connect: { id: tag.id } },
                     })),
                 },
+                categories: {
+                    create: categories.map(category => ({
+                        category: { connect: { id: category.id } },
+                    })),
+                },
             },
-            include: { tags: { include: { tag: true } } },
+            include: { tags: { include: { tag: true } }, categories: { include: { category: true } } },
         });
     }
     async getContents() {
         const contents = await this.prisma.content.findMany({
             include: {
                 tags: { include: { tag: true } },
+                categories: { include: { category: true } },
             },
         });
         return contents.map((content) => ({
             id: content.id,
             content: content.content,
             tags: content.tags.map(tagRelation => tagRelation.tag.name),
+            categories: content.categories.map(categoryRelation => categoryRelation.category.name),
         }));
     }
 };

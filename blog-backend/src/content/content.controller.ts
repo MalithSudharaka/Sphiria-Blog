@@ -9,6 +9,7 @@ export class ContentController {
   async saveContent(
     @Body('content') content: string,
     @Body('tags') tags: string[],
+    @Body('categories') categories: string[],  // Add categories parameter
     @Res() res
   ) {
     if (!content) {
@@ -17,7 +18,7 @@ export class ContentController {
         .json({ error: 'Content is required' });
     }
 
-    const savedContent = await this.contentService.saveContent(content, tags);
+    const savedContent = await this.contentService.saveContent(content, tags, categories);  // Pass categories to the service
     return res.status(HttpStatus.CREATED).json({
       message: 'Content saved successfully!',
       data: savedContent,

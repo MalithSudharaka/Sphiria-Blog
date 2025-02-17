@@ -19,13 +19,13 @@ let ContentController = class ContentController {
     constructor(contentService) {
         this.contentService = contentService;
     }
-    async saveContent(content, tags, res) {
+    async saveContent(content, tags, categories, res) {
         if (!content) {
             return res
                 .status(common_1.HttpStatus.BAD_REQUEST)
                 .json({ error: 'Content is required' });
         }
-        const savedContent = await this.contentService.saveContent(content, tags);
+        const savedContent = await this.contentService.saveContent(content, tags, categories);
         return res.status(common_1.HttpStatus.CREATED).json({
             message: 'Content saved successfully!',
             data: savedContent,
@@ -41,9 +41,10 @@ __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)('content')),
     __param(1, (0, common_1.Body)('tags')),
-    __param(2, (0, common_1.Res)()),
+    __param(2, (0, common_1.Body)('categories')),
+    __param(3, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Array, Object]),
+    __metadata("design:paramtypes", [String, Array, Array, Object]),
     __metadata("design:returntype", Promise)
 ], ContentController.prototype, "saveContent", null);
 __decorate([

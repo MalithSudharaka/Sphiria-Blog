@@ -3,8 +3,9 @@ import axios from "axios";
 import "./TagInput.css";
 
 interface CategoryInputProps {
-  onCategoriesChange: (categories: string[]) => void;
-}
+    onCategoriesChange: (categories: string[]) => void;
+  }
+  
 
 const CategoryInput = ({ onCategoriesChange }: CategoryInputProps) => {
   const [categories, setCategories] = useState<string[]>([]);

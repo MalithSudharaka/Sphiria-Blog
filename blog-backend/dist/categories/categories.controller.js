@@ -28,6 +28,12 @@ let CategoriesController = class CategoriesController {
     async create(name) {
         return this.categoriesService.create(name);
     }
+    async addCategoriesToContent(contentId, categoryIds) {
+        return this.categoriesService.addCategoriesToContent(contentId, categoryIds);
+    }
+    async getCategoriesForContent(contentId) {
+        return this.categoriesService.getCategoriesForContent(contentId);
+    }
 };
 exports.CategoriesController = CategoriesController;
 __decorate([
@@ -50,6 +56,21 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "create", null);
+__decorate([
+    (0, common_1.Post)('content/:contentId/categories'),
+    __param(0, (0, common_1.Param)('contentId')),
+    __param(1, (0, common_1.Body)('categoryIds')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Array]),
+    __metadata("design:returntype", Promise)
+], CategoriesController.prototype, "addCategoriesToContent", null);
+__decorate([
+    (0, common_1.Get)('content/:contentId/categories'),
+    __param(0, (0, common_1.Param)('contentId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], CategoriesController.prototype, "getCategoriesForContent", null);
 exports.CategoriesController = CategoriesController = __decorate([
     (0, common_1.Controller)('categories'),
     __metadata("design:paramtypes", [categories_service_1.CategoriesService])

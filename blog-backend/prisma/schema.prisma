@@ -10,9 +10,31 @@ datasource db {
 model Content {
   id        String      @id @default(auto()) @map("_id") @db.ObjectId
   content   String
-  tags      ContentTag[] // Relation to the join collection
+  categories ContentCategory[]  // Relation to the join collection
+  tags      ContentTag[]       // Relation to the join collection
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+}
+
+model Categories {
+  id        String      @id @default(auto()) @map("_id") @db.ObjectId
+  name      String      @unique
+  contents  ContentCategory[]  // Relation to the join collection
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+// Join collection for many-to-many relationship between Content and Categories
+model ContentCategory {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  contentId   String    @db.ObjectId
+  categoryId  String    @db.ObjectId
+  content     Content   @relation(fields: [contentId], references: [id])
+  category    Categories @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([contentId, categoryId]) // Ensure unique pairs of content and category
 }
 
 model Tag {
@@ -23,7 +45,7 @@ model Tag {
   updatedAt DateTime    @updatedAt
 }
 
-// Join collection for many-to-many relationship
+// Join collection for many-to-many relationship between Content and Tag
 model ContentTag {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   contentId String   @db.ObjectId
@@ -34,11 +56,4 @@ model ContentTag {
   updatedAt DateTime @updatedAt
 
   @@unique([contentId, tagId]) // Ensure unique pairs of content and tag
-}
-
-model Categories {
-  id        String      @id @default(auto()) @map("_id") @db.ObjectId
-  name      String      @unique
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
 }

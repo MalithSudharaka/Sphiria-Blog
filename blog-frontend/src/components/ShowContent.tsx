@@ -6,7 +6,8 @@ interface ContentItem {
   content: string;
   createdAt: string;
   updatedAt: string;
-  tags: string[];
+  tags: string[]; 
+  categories: string[]; 
 }
 
 const ShowContent: React.FC = () => {
@@ -58,6 +59,23 @@ const ShowContent: React.FC = () => {
                       className="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
                     >
                       {tag}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500">No tags available</p>
+              )}
+            </div>
+            <div className="mt-4">
+              <strong className="text-gray-700">Categories:</strong>
+              {item.categories.length > 0 ? (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {item.categories.map((category, index) => (
+                    <span
+                      key={index}
+                      className="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
+                    >
+                      {category}
                     </span>
                   ))}
                 </div>

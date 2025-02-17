@@ -1,4 +1,5 @@
 import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 export declare class CategoriesService {
     private readonly prisma;
     constructor(prisma: PrismaService);
@@ -20,4 +21,19 @@ export declare class CategoriesService {
         createdAt: Date;
         updatedAt: Date;
     }>;
+    addCategoriesToContent(contentId: string, categoryIds: string[]): Promise<Prisma.BatchPayload>;
+    getCategoriesForContent(contentId: string): Promise<({
+        category: {
+            id: string;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+        };
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        contentId: string;
+        categoryId: string;
+    })[]>;
 }

@@ -1,0 +1,89 @@
+.editor-container {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  max-width: 800px;
+  margin: auto;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding-bottom: 10px;
+}
+
+.toolbar button {
+  background: #f4f4f4;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.toolbar button.active {
+  background: #007bff;
+  color: white;
+}
+.toolbar button.active {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+.toolbar button.active {
+  background-color: #4caf50; /* Green background for active buttons */
+  color: white; /* White text for better contrast */
+}
+/* Add this to your CSS file for styling the active toolbar button */
+.toolbar button {
+  padding: 8px;
+  border: 1px solid #ddd;
+  background-color: transparent;
+  transition: background-color 0.3s ease;
+}
+
+.toolbar button.active {
+  background-color: #007bff; /* Blue background on active */
+  color: white; /* White text color when active */
+  border-color: #007bff; /* Matching border color */
+}
+
+.toolbar button:hover {
+  background-color: #f0f0f0; /* Light gray on hover */
+}
+/* styles.css */
+.toolbar button.active {
+  background-color: #4caf50; /* Green background for active buttons */
+  color: white; /* White text for better contrast */
+}
+.font-size-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.font-size-picker select {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px;
+  cursor: pointer;
+}
+/* Add this to your TiptapEditor.css file */
+img {
+    max-width: 100%;
+    height: auto;
+    display: inline-block;
+    position: relative;
+  }
+  
+  .resize-handle {
+    position: absolute;
+    right: -5px;
+    bottom: -5px;
+    width: 10px;
+    height: 10px;
+    background-color: #4a90e2;
+    border: 1px solid #fff;
+    cursor: se-resize;
+  }

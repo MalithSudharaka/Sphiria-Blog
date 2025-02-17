@@ -28,6 +28,15 @@ let CategoriesController = class CategoriesController {
     async create(name) {
         return this.categoriesService.create(name);
     }
+    async update(id, name) {
+        if (!name) {
+            throw new common_1.BadRequestException('Category name is required');
+        }
+        return this.categoriesService.update(id, name);
+    }
+    async delete(id) {
+        return this.categoriesService.delete(id);
+    }
     async addCategoriesToContent(contentId, categoryIds) {
         return this.categoriesService.addCategoriesToContent(contentId, categoryIds);
     }
@@ -56,6 +65,21 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('name')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], CategoriesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], CategoriesController.prototype, "delete", null);
 __decorate([
     (0, common_1.Post)('content/:contentId/categories'),
     __param(0, (0, common_1.Param)('contentId')),

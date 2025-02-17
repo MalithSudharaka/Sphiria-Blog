@@ -1,4 +1,4 @@
-import { FC } from "react";
+/* import { FC } from "react";
 import { EditorContent, Editor } from "@tiptap/react";
 import { useDropzone } from "react-dropzone";
 
@@ -24,3 +24,4 @@ const EditorContentWrapper: FC<EditorContentWrapperProps> = ({ editor, handleDro
 };
 
 export default EditorContentWrapper;
+ */

@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CategoriesService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
-const client_1 = require("@prisma/client");
 let CategoriesService = class CategoriesService {
     constructor(prisma) {
         this.prisma = prisma;
@@ -22,9 +21,8 @@ let CategoriesService = class CategoriesService {
     }
     async findOne(id) {
         const category = await this.prisma.categories.findUnique({ where: { id } });
-        if (!category) {
-            throw new common_1.NotFoundException(`Category with ID ${id} not found`);
-        }
+        if (!category)
+            throw new common_1.NotFoundException('Category not found');
         return category;
     }
     async create(name) {
@@ -34,31 +32,40 @@ let CategoriesService = class CategoriesService {
             });
         }
         catch (error) {
-            if (error instanceof client_1.Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-                throw new common_1.BadRequestException('Category name must be unique');
-            }
-            throw new common_1.BadRequestException('Failed to create category');
+            throw new common_1.BadRequestException('Category creation failed');
         }
     }
-    async addCategoriesToContent(contentId, categoryIds) {
-        const categories = await this.prisma.categories.findMany({
-            where: { id: { in: categoryIds } },
+    async update(id, name) {
+        const existingCategory = await this.prisma.categories.findUnique({ where: { id } });
+        if (!existingCategory)
+            throw new common_1.NotFoundException('Category not found');
+        return this.prisma.categories.update({
+            where: { id },
+            data: { name },
         });
-        if (categories.length !== categoryIds.length) {
-            throw new common_1.NotFoundException('Some categories not found');
-        }
-        const contentCategoriesData = categoryIds.map((categoryId) => ({
-            contentId,
-            categoryId,
-        }));
-        return this.prisma.contentCategory.createMany({
-            data: contentCategoriesData,
+    }
+    async delete(id) {
+        const category = await this.prisma.categories.findUnique({ where: { id } });
+        if (!category)
+            throw new common_1.NotFoundException('Category not found');
+        return this.prisma.categories.delete({
+            where: { id },
+        });
+    }
+    async addCategoriesToContent(contentId, categoryIds) {
+        return this.prisma.content.update({
+            where: { id: contentId },
+            data: {
+                categories: {
+                    connect: categoryIds.map(id => ({ id })),
+                },
+            },
         });
     }
     async getCategoriesForContent(contentId) {
-        return this.prisma.contentCategory.findMany({
-            where: { contentId },
-            include: { category: true },
+        return this.prisma.content.findUnique({
+            where: { id: contentId },
+            include: { categories: true },
         });
     }
 };

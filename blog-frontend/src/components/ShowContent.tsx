@@ -1,14 +1,41 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 interface ContentItem {
   id: string;
   content: string;
   createdAt: string;
   updatedAt: string;
-  tags: string[]; 
-  categories: string[]; 
+  tags: string[];
+  categories: string[];
+  type: string;
+  location?: string; // Optional, only for events
+  time?: string; // Optional, only for events
 }
+
+// Function to extract width and height from Base64 metadata
+const extractBase64Metadata = (html: string) => {
+  return html.replace(/<img[^>]+src="data:image\/[^";]+;base64,[^"]+"/g, (match) => {
+    // Extract base64 data and dimensions
+    const base64Match = match.match(/src="([^"]+)"/);
+    if (!base64Match) return match;
+
+    let base64String = base64Match[1];
+    const metadataMatch = base64String.match(/\|width:(\d+)\|height:(\d+)$/);
+
+    if (metadataMatch) {
+      const width = metadataMatch[1];
+      const height = metadataMatch[2];
+
+      // Remove the embedded metadata from the base64 string
+      base64String = base64String.split("|width:")[0];
+
+      return match.replace(base64Match[1], base64String).replace("<img", `<img width="${width}" height="${height}"`);
+    }
+
+    return match; // Return the original if no metadata found
+  });
+};
 
 const ShowContent: React.FC = () => {
   const [contentList, setContentList] = useState<ContentItem[]>([]);
@@ -18,10 +45,11 @@ const ShowContent: React.FC = () => {
   // Fetch content from the backend
   const fetchContent = async () => {
     try {
-      const response = await axios.get<ContentItem[]>('http://localhost:5000/contents');
+      const response = await axios.get<ContentItem[]>("http://localhost:5000/contents");
       setContentList(response.data);
     } catch (err) {
-      setError('Failed to load content');
+      setError("Failed to load content. Please try again later.");
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -32,23 +60,32 @@ const ShowContent: React.FC = () => {
   }, []);
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6">Saved Content</h2>
-      {loading && <p className="text-gray-600">Loading...</p>}
-      {error && <p className="text-red-500">{error}</p>}
+    <div className="p-8 bg-gray-100 min-h-screen">
+      <h2 className="text-4xl font-extrabold text-gray-900 mb-8">Saved Content</h2>
+
+      {/* Loading and error messages */}
+      {loading && <p className="text-lg text-gray-600">Loading...</p>}
+      {error && <p className="text-lg text-red-600">{error}</p>}
+
+      {/* Display message when no content is available */}
       {contentList.length === 0 && !loading && (
-        <p className="text-gray-600">No content available.</p>
+        <p className="text-lg text-gray-600">No content available.</p>
       )}
-      <div className="space-y-6">
+
+      {/* Content list */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {contentList.map((item) => (
           <div
             key={item.id}
-            className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+            className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 ease-in-out"
           >
+            {/* Content with embedded image width and height */}
             <div
-              className="prose prose-sm max-w-none"
-              dangerouslySetInnerHTML={{ __html: item.content }}
+              className="prose max-w-none text-gray-800"
+              dangerouslySetInnerHTML={{ __html: extractBase64Metadata(item.content) }}
             />
+
+            {/* Tags */}
             <div className="mt-4">
               <strong className="text-gray-700">Tags:</strong>
               {item.tags.length > 0 ? (
@@ -56,7 +93,7 @@ const ShowContent: React.FC = () => {
                   {item.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
+                      className="inline-block bg-blue-200 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
                     >
                       {tag}
                     </span>
@@ -66,6 +103,8 @@ const ShowContent: React.FC = () => {
                 <p className="text-gray-500">No tags available</p>
               )}
             </div>
+
+            {/* Categories */}
             <div className="mt-4">
               <strong className="text-gray-700">Categories:</strong>
               {item.categories.length > 0 ? (
@@ -73,15 +112,21 @@ const ShowContent: React.FC = () => {
                   {item.categories.map((category, index) => (
                     <span
                       key={index}
-                      className="inline-block bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"
+                      className="inline-block bg-green-200 text-green-800 text-sm font-medium px-3 py-1 rounded-full"
                     >
                       {category}
                     </span>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500">No tags available</p>
+                <p className="text-gray-500">No categories available</p>
               )}
+            </div>
+
+            {/* Additional information */}
+            <div className="mt-4 text-sm text-gray-500">
+              <p>Created on: {new Date(item.createdAt).toLocaleDateString()}</p>
+              <p>Last updated: {new Date(item.updatedAt).toLocaleDateString()}</p>
             </div>
           </div>
         ))}

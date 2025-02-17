@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import "./TagInput.css";
 
 interface CategoryInputProps {
-    onCategoriesChange: (categories: string[]) => void;
-  }
-  
+  onCategoriesChange: (categories: string[]) => void;
+}
 
 const CategoryInput = ({ onCategoriesChange }: CategoryInputProps) => {
   const [categories, setCategories] = useState<string[]>([]);
@@ -61,30 +59,43 @@ const CategoryInput = ({ onCategoriesChange }: CategoryInputProps) => {
   };
 
   return (
-    <div className="category-input-container">
-      <div className="selected-categories">
+    <div className="relative w-full">
+      {/* Selected categories */}
+      <div className="flex flex-wrap gap-2 mb-2">
         {selectedCategories.map((category, index) => (
-          <span key={index} className="selected-category">
-            {category}
-            <button onClick={() => handleRemoveCategory(category)} className="remove-category">
+          <span
+            key={index}
+            className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full flex items-center space-x-2"
+          >
+            <span>{category}</span>
+            <button
+              onClick={() => handleRemoveCategory(category)}
+              className="text-red-600 hover:text-red-800 focus:outline-none"
+            >
               ✖
             </button>
           </span>
         ))}
       </div>
 
+      {/* Input field */}
       <input
         type="text"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         placeholder="Search and select categories..."
-        className="category-input"
+        className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
+      {/* Dropdown for category suggestions */}
       {showDropdown && filteredCategories.length > 0 && (
-        <div className="category-dropdown">
+        <div className="absolute left-0 right-0 mt-2 bg-white shadow-lg rounded-lg border border-gray-300 max-h-60 overflow-auto z-10">
           {filteredCategories.map((category, index) => (
-            <div key={index} className="category-item" onClick={() => handleSelectCategory(category)}>
+            <div
+              key={index}
+              className="p-2 cursor-pointer hover:bg-gray-100 text-gray-800"
+              onClick={() => handleSelectCategory(category)}
+            >
               {category}
             </div>
           ))}

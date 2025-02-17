@@ -5,7 +5,6 @@ import ShowContent from './components/ShowContent';
 const App: React.FC = () => {
   return (
     <div>
-      <h1>My Beautiful Text Editor</h1>
       <TiptapEditor />
       <ShowContent />
     </div>

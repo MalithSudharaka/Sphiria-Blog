@@ -12,20 +12,33 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContentController = void 0;
+exports.ContentController = exports.ContentType = void 0;
 const common_1 = require("@nestjs/common");
 const content_service_1 = require("./content.service");
+var ContentType;
+(function (ContentType) {
+    ContentType["EVENTS"] = "EVENTS";
+    ContentType["BLOG"] = "BLOG";
+    ContentType["NEWS"] = "NEWS";
+    ContentType["CHARITY"] = "CHARITY";
+    ContentType["OTHER"] = "OTHER";
+})(ContentType || (exports.ContentType = ContentType = {}));
 let ContentController = class ContentController {
     constructor(contentService) {
         this.contentService = contentService;
     }
-    async saveContent(content, tags, categories, res) {
-        if (!content) {
-            return res
-                .status(common_1.HttpStatus.BAD_REQUEST)
-                .json({ error: 'Content is required' });
+    async saveContent(content, title, type, tags, categories, location, time, res) {
+        if (!content || !title || !type) {
+            return res.status(common_1.HttpStatus.BAD_REQUEST).json({
+                error: 'Content, title, and type are required',
+            });
         }
-        const savedContent = await this.contentService.saveContent(content, tags, categories);
+        if (type === ContentType.EVENTS && (!location || !time)) {
+            return res.status(common_1.HttpStatus.BAD_REQUEST).json({
+                error: 'Location and time are required for events',
+            });
+        }
+        const savedContent = await this.contentService.saveContent(content, tags, categories, type, title, location, time);
         return res.status(common_1.HttpStatus.CREATED).json({
             message: 'Content saved successfully!',
             data: savedContent,
@@ -39,12 +52,17 @@ let ContentController = class ContentController {
 exports.ContentController = ContentController;
 __decorate([
     (0, common_1.Post)(),
+    (0, common_1.Post)(),
     __param(0, (0, common_1.Body)('content')),
-    __param(1, (0, common_1.Body)('tags')),
-    __param(2, (0, common_1.Body)('categories')),
-    __param(3, (0, common_1.Res)()),
+    __param(1, (0, common_1.Body)('title')),
+    __param(2, (0, common_1.Body)('type')),
+    __param(3, (0, common_1.Body)('tags')),
+    __param(4, (0, common_1.Body)('categories')),
+    __param(5, (0, common_1.Body)('location')),
+    __param(6, (0, common_1.Body)('time')),
+    __param(7, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Array, Array, Object]),
+    __metadata("design:paramtypes", [String, String, String, Array, Array, String, String, Object]),
     __metadata("design:returntype", Promise)
 ], ContentController.prototype, "saveContent", null);
 __decorate([

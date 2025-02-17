@@ -19,16 +19,39 @@ let TagsController = class TagsController {
     constructor(tagService) {
         this.tagService = tagService;
     }
+    async findAll() {
+        return this.tagService.findAll();
+    }
     async suggestTags(query, res) {
         const suggestedTags = await this.tagService.getSuggestedTags(query);
         return res.status(common_1.HttpStatus.OK).json(suggestedTags);
     }
     async createTag(body, res) {
+        if (!body.name) {
+            throw new common_1.BadRequestException('Tag name is required');
+        }
         const tag = await this.tagService.createTag(body.name);
         return res.status(common_1.HttpStatus.CREATED).json({ message: 'Tag created', tag });
     }
+    async updateTag(id, body, res) {
+        if (!body.name) {
+            throw new common_1.BadRequestException('Tag name is required');
+        }
+        const updatedTag = await this.tagService.updateTag(id, body.name);
+        return res.status(common_1.HttpStatus.OK).json({ message: 'Tag updated', updatedTag });
+    }
+    async deleteTag(id, res) {
+        await this.tagService.deleteTag(id);
+        return res.status(common_1.HttpStatus.OK).json({ message: 'Tag deleted' });
+    }
 };
 exports.TagsController = TagsController;
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], TagsController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Get)('suggest'),
     __param(0, (0, common_1.Query)('query')),
@@ -45,6 +68,23 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], TagsController.prototype, "createTag", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], TagsController.prototype, "updateTag", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], TagsController.prototype, "deleteTag", null);
 exports.TagsController = TagsController = __decorate([
     (0, common_1.Controller)('tags'),
     __metadata("design:paramtypes", [tags_service_1.TagsService])

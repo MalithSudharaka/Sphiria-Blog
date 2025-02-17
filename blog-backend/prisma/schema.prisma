@@ -7,42 +7,58 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Enum for predefined content types
+enum ContentType {
+  EVENTS
+  BLOG
+  NEWS
+  CHARITY
+  OTHER
+}
+
 model Content {
-  id        String      @id @default(auto()) @map("_id") @db.ObjectId
-  content   String
-  categories ContentCategory[]  // Relation to the join collection
-  tags      ContentTag[]       // Relation to the join collection
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id         String            @id @default(auto()) @map("_id") @db.ObjectId
+  content    String
+  categories ContentCategory[] // Relation to the join collection
+  tags       ContentTag[] // Relation to the join collection
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  title      String?
+  type       ContentType?  
+  
+
+  // Event-specific fields
+  location   String?           // Optional field for location, required for events
+  time       DateTime?         // Optional field for event start time, required for events
 }
 
 model Categories {
-  id        String      @id @default(auto()) @map("_id") @db.ObjectId
-  name      String      @unique
-  contents  ContentCategory[]  // Relation to the join collection
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id        String            @id @default(auto()) @map("_id") @db.ObjectId
+  name      String            @unique
+  contents  ContentCategory[] // Relation to the join collection
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
 }
 
 // Join collection for many-to-many relationship between Content and Categories
 model ContentCategory {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  contentId   String    @db.ObjectId
-  categoryId  String    @db.ObjectId
-  content     Content   @relation(fields: [contentId], references: [id])
-  category    Categories @relation(fields: [categoryId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  contentId  String     @db.ObjectId
+  categoryId String     @db.ObjectId
+  content    Content    @relation(fields: [contentId], references: [id])
+  category   Categories @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   @@unique([contentId, categoryId]) // Ensure unique pairs of content and category
 }
 
 model Tag {
-  id        String      @id @default(auto()) @map("_id") @db.ObjectId
-  name      String      @unique
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  name      String       @unique
   contents  ContentTag[] // Relation to the join collection
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }
 
 // Join collection for many-to-many relationship between Content and Tag

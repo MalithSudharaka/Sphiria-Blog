@@ -16,6 +16,9 @@ let TagsService = class TagsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async findAll() {
+        return this.prisma.tag.findMany();
+    }
     async getSuggestedTags(query) {
         return this.prisma.tag.findMany({
             where: {
@@ -29,10 +32,33 @@ let TagsService = class TagsService {
         });
     }
     async createTag(name) {
-        return this.prisma.tag.create({
-            data: {
-                name,
-            },
+        try {
+            const newTag = await this.prisma.tag.create({
+                data: { name },
+            });
+            return newTag;
+        }
+        catch (error) {
+            throw new common_1.BadRequestException('Tag creation failed');
+        }
+    }
+    async updateTag(id, name) {
+        const existingTag = await this.prisma.tag.findUnique({ where: { id } });
+        if (!existingTag) {
+            throw new common_1.NotFoundException('Tag not found');
+        }
+        return this.prisma.tag.update({
+            where: { id },
+            data: { name },
+        });
+    }
+    async deleteTag(id) {
+        const existingTag = await this.prisma.tag.findUnique({ where: { id } });
+        if (!existingTag) {
+            throw new common_1.NotFoundException('Tag not found');
+        }
+        return this.prisma.tag.delete({
+            where: { id },
         });
     }
 };

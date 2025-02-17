@@ -15,14 +15,17 @@ const content_module_1 = require("./content/content.module");
 const tags_service_1 = require("./tags/tags.service");
 const tags_controller_1 = require("./tags/tags.controller");
 const tags_module_1 = require("./tags/tags.module");
+const categories_service_1 = require("./categories/categories.service");
+const categories_controller_1 = require("./categories/categories.controller");
+const categories_module_1 = require("./categories/categories.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [content_module_1.ContentModule, tags_module_1.TagsModule],
-        controllers: [app_controller_1.AppController, tags_controller_1.TagsController],
-        providers: [app_service_1.AppService, prisma_service_1.PrismaService, tags_service_1.TagsService],
+        imports: [content_module_1.ContentModule, tags_module_1.TagsModule, categories_module_1.CategoriesModule],
+        controllers: [app_controller_1.AppController, tags_controller_1.TagsController, categories_controller_1.CategoriesController],
+        providers: [app_service_1.AppService, prisma_service_1.PrismaService, tags_service_1.TagsService, categories_service_1.CategoriesService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

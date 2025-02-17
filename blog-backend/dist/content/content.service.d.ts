@@ -5,10 +5,10 @@ export declare class ContentService {
     saveContent(content: string, tagNames: string[]): Promise<{
         tags: ({
             tag: {
+                name: string;
                 id: string;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
             };
         } & {
             id: string;

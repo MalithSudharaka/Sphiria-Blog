@@ -6,8 +6,8 @@ export declare class TagsService {
         name: string;
     }[]>;
     createTag(name: string): Promise<{
-        id: string;
         name: string;
+        id: string;
         createdAt: Date;
         updatedAt: Date;
     }>;

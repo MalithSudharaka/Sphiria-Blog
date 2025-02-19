@@ -20,7 +20,8 @@ export class ContentService {
     type: ContentType,
     title: string,
     location: string,
-    time: string, // Ensure this is a valid ISO-8601 DateTime string
+    time: string,
+    thumbnail: string,
   ) {
     // Find or create tags
     const tags = await Promise.all(
@@ -59,7 +60,8 @@ export class ContentService {
         type,
         title,
         location,
-        time: validTime, // Use validated time
+        time: validTime,
+        thumbnail,
         tags: {
           create: tags.map((tag) => ({
             tag: { connect: { id: tag.id } },
@@ -92,6 +94,7 @@ export class ContentService {
       content: content.content,
       title: content.title, // Include title in the response
       type: content.type, // Include type in the response
+      thumbnail: content.thumbnail, // Include thumbnail in the response
       location: content.location, // Include location (if type is event)
       time: content.time, // Include time (if type is event)
       tags: content.tags.map((tagRelation) => tagRelation.tag.name), // Extract only tag names

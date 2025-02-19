@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import "./TagInput.css";
 
 interface TagInputProps {
   onTagsChange: (tags: string[]) => void;
@@ -71,33 +70,52 @@ const TagInput = ({ onTagsChange }: TagInputProps) => {
   };
 
   return (
-    <div className="tag-input-container">
+    <div className="space-y-2">
+      {/* Input Field */}
       <input
         type="text"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Add a tag and press Enter..."
-        className="tag-input"
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
-      {/* Show suggested tags dropdown */}
+      {/* Suggested Tags Dropdown */}
       {showDropdown && suggestedTags.length > 0 && (
-        <div className="suggestions">
+        <div className="mt-2 bg-white border border-gray-300 rounded-lg shadow-lg">
           {suggestedTags.map((suggestedTag, index) => (
-            <div key={index} className="suggestion-item" onClick={() => addTag(suggestedTag)}>
+            <div
+              key={index}
+              onClick={() => addTag(suggestedTag)}
+              className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+            >
               {suggestedTag}
             </div>
           ))}
-          <span onClick={() => setShowDropdown(false)}>X</span>
+          <div
+            onClick={() => setShowDropdown(false)}
+            className="px-4 py-2 text-gray-500 hover:bg-gray-100 cursor-pointer"
+          >
+            Close
+          </div>
         </div>
       )}
 
-      <div className="tag-list">
+      {/* Tag List */}
+      <div className="flex flex-wrap gap-2">
         {tags.map((tag, index) => (
-          <span key={index} className="tag">
+          <span
+            key={index}
+            className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+          >
             {tag}
-            <button onClick={() => removeTag(index)} className="remove-tag">✖</button>
+            <button
+              onClick={() => removeTag(index)}
+              className="ml-2 text-blue-800 hover:text-blue-900 focus:outline-none"
+            >
+              ✖
+            </button>
           </span>
         ))}
       </div>

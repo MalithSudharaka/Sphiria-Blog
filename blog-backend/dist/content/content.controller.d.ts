@@ -9,6 +9,6 @@ export declare enum ContentType {
 export declare class ContentController {
     private readonly contentService;
     constructor(contentService: ContentService);
-    saveContent(content: string, title: string, type: ContentType, tags: string[], categories: string[], location: string, time: string, res: any): Promise<any>;
+    saveContent(content: string, title: string, type: ContentType, tags: string[], categories: string[], location: string, time: string, thumbnail: string, res: any): Promise<any>;
     getContents(res: any): Promise<any>;
 }

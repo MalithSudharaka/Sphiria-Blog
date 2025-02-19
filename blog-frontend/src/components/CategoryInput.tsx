@@ -65,12 +65,12 @@ const CategoryInput = ({ onCategoriesChange }: CategoryInputProps) => {
         {selectedCategories.map((category, index) => (
           <span
             key={index}
-            className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full flex items-center space-x-2"
+            className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
           >
-            <span>{category}</span>
+            {category}
             <button
               onClick={() => handleRemoveCategory(category)}
-              className="text-red-600 hover:text-red-800 focus:outline-none"
+              className="ml-2 text-blue-800 hover:text-blue-900 focus:outline-none"
             >
               ✖
             </button>
@@ -84,16 +84,16 @@ const CategoryInput = ({ onCategoriesChange }: CategoryInputProps) => {
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         placeholder="Search and select categories..."
-        className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
       {/* Dropdown for category suggestions */}
       {showDropdown && filteredCategories.length > 0 && (
-        <div className="absolute left-0 right-0 mt-2 bg-white shadow-lg rounded-lg border border-gray-300 max-h-60 overflow-auto z-10">
+        <div className="absolute left-0 right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto z-10">
           {filteredCategories.map((category, index) => (
             <div
               key={index}
-              className="p-2 cursor-pointer hover:bg-gray-100 text-gray-800"
+              className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-gray-800"
               onClick={() => handleSelectCategory(category)}
             >
               {category}

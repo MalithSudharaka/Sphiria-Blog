@@ -39,6 +39,7 @@ export declare class CategoriesService {
         updatedAt: Date;
         title: string | null;
         type: import(".prisma/client").$Enums.ContentType | null;
+        thumbnail: string | null;
         location: string | null;
         time: Date | null;
     }>;
@@ -57,6 +58,7 @@ export declare class CategoriesService {
         updatedAt: Date;
         title: string | null;
         type: import(".prisma/client").$Enums.ContentType | null;
+        thumbnail: string | null;
         location: string | null;
         time: Date | null;
     }) | null>;

@@ -9,7 +9,7 @@ export declare enum ContentType {
 export declare class ContentService {
     private prisma;
     constructor(prisma: PrismaService);
-    saveContent(content: string, tagNames: string[], categoryNames: string[], type: ContentType, title: string, location: string, time: string): Promise<{
+    saveContent(content: string, tagNames: string[], categoryNames: string[], type: ContentType, title: string, location: string, time: string, thumbnail: string): Promise<{
         categories: ({
             category: {
                 name: string;
@@ -45,6 +45,7 @@ export declare class ContentService {
         updatedAt: Date;
         title: string | null;
         type: import(".prisma/client").$Enums.ContentType | null;
+        thumbnail: string | null;
         location: string | null;
         time: Date | null;
     }>;
@@ -53,6 +54,7 @@ export declare class ContentService {
         content: string;
         title: string | null;
         type: import(".prisma/client").$Enums.ContentType | null;
+        thumbnail: string | null;
         location: string | null;
         time: Date | null;
         tags: string[];

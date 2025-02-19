@@ -27,7 +27,7 @@ let ContentController = class ContentController {
     constructor(contentService) {
         this.contentService = contentService;
     }
-    async saveContent(content, title, type, tags, categories, location, time, res) {
+    async saveContent(content, title, type, tags, categories, location, time, thumbnail, res) {
         if (!content || !title || !type) {
             return res.status(common_1.HttpStatus.BAD_REQUEST).json({
                 error: 'Content, title, and type are required',
@@ -38,7 +38,7 @@ let ContentController = class ContentController {
                 error: 'Location and time are required for events',
             });
         }
-        const savedContent = await this.contentService.saveContent(content, tags, categories, type, title, location, time);
+        const savedContent = await this.contentService.saveContent(content, tags, categories, type, title, location, time, thumbnail);
         return res.status(common_1.HttpStatus.CREATED).json({
             message: 'Content saved successfully!',
             data: savedContent,
@@ -60,9 +60,10 @@ __decorate([
     __param(4, (0, common_1.Body)('categories')),
     __param(5, (0, common_1.Body)('location')),
     __param(6, (0, common_1.Body)('time')),
-    __param(7, (0, common_1.Res)()),
+    __param(7, (0, common_1.Body)('thumbnail')),
+    __param(8, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, Array, Array, String, String, Object]),
+    __metadata("design:paramtypes", [String, String, String, Array, Array, String, String, String, Object]),
     __metadata("design:returntype", Promise)
 ], ContentController.prototype, "saveContent", null);
 __decorate([

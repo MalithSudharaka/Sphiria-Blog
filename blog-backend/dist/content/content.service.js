@@ -24,7 +24,7 @@ let ContentService = class ContentService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async saveContent(content, tagNames, categoryNames, type, title, location, time) {
+    async saveContent(content, tagNames, categoryNames, type, title, location, time, thumbnail) {
         const tags = await Promise.all(tagNames.map(async (name) => this.prisma.tag.upsert({
             where: { name },
             update: {},
@@ -49,6 +49,7 @@ let ContentService = class ContentService {
                 title,
                 location,
                 time: validTime,
+                thumbnail,
                 tags: {
                     create: tags.map((tag) => ({
                         tag: { connect: { id: tag.id } },
@@ -78,6 +79,7 @@ let ContentService = class ContentService {
             content: content.content,
             title: content.title,
             type: content.type,
+            thumbnail: content.thumbnail,
             location: content.location,
             time: content.time,
             tags: content.tags.map((tagRelation) => tagRelation.tag.name),

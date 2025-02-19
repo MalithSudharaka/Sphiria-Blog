@@ -22,6 +22,7 @@ export class ContentController {
     @Body('categories') categories: string[],
     @Body('location') location: string, // Add location parameter (for events)
     @Body('time') time: string, // Add time parameter (for events)
+    @Body('thumbnail') thumbnail: string, // Add thumbnail parameter
     @Res() res,
   ) {
     if (!content || !title || !type) {
@@ -44,6 +45,7 @@ export class ContentController {
       title,
       location,
       time,
+      thumbnail,
     );
 
     return res.status(HttpStatus.CREATED).json({

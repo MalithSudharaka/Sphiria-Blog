@@ -24,12 +24,12 @@ model Content {
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
   title      String?
-  type       ContentType?  
-  
+  type       ContentType?
+  thumbnail  String?
 
   // Event-specific fields
-  location   String?           // Optional field for location, required for events
-  time       DateTime?         // Optional field for event start time, required for events
+  location String? // Optional field for location, required for events
+  time     DateTime? // Optional field for event start time, required for events
 }
 
 model Categories {

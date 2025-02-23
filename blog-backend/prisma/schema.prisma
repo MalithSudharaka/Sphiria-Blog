@@ -16,6 +16,12 @@ enum ContentType {
   OTHER
 }
 
+enum ContentMode {
+  DRAFT
+  PUBLISHED
+  // ARCHIVED
+}
+
 model Content {
   id         String            @id @default(auto()) @map("_id") @db.ObjectId
   content    String
@@ -30,7 +36,9 @@ model Content {
   // Event-specific fields
   location String? // Optional field for location, required for events
   time     DateTime? // Optional field for event start time, required for events
+  mode     String @default("DRAFT") 
 }
+
 
 model Categories {
   id        String            @id @default(auto()) @map("_id") @db.ObjectId

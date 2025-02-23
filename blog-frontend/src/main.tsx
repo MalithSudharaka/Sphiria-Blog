@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import "./index.css";
 import ShowContent from "./components/ShowContent";
 import "quill/dist/quill.snow.css"; // Snow theme (or "quill.bubble.css" for bubble theme)
+import EditQuillEditor from "./pages/EditQuil";
 
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -14,7 +15,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/" element={<ShowContent />} />
+        <Route path="/edit-content" element={<EditQuillEditor />} />
+        {/* <Route path="/" element={<ShowContent />} /> */}
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

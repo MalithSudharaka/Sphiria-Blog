@@ -16,7 +16,7 @@ interface ContentItem {
   thumbnail?: string; // Thumbnail URL
 }
 
-const ShowContent: React.FC = () => {
+const ShowDraft: React.FC = () => {
   const [contentList, setContentList] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +26,7 @@ const ShowContent: React.FC = () => {
   const fetchContent = async () => {
     try {
       const response = await axios.get<ContentItem[]>(
-        "http://localhost:5000/contents?mode=PUBLISHED"
+        "http://localhost:5000/contents?mode=DRAFT"
       );
       setContentList(response.data);
     } catch (err) {
@@ -49,7 +49,7 @@ const ShowContent: React.FC = () => {
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       <h2 className="text-4xl font-extrabold text-gray-900 mb-8">
-        Saved Content
+        Saved Drafts
       </h2>
 
       {/* Loading and error messages */}
@@ -157,4 +157,4 @@ const ShowContent: React.FC = () => {
   );
 };
 
-export default ShowContent;
+export default ShowDraft;

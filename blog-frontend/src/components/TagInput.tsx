@@ -3,10 +3,11 @@ import axios from "axios";
 
 interface TagInputProps {
   onTagsChange: (tags: string[]) => void;
+  initialTags?: string[]; // Add initialTags prop
 }
 
-const TagInput = ({ onTagsChange }: TagInputProps) => {
-  const [tags, setTags] = useState<string[]>([]);
+const TagInput = ({ onTagsChange, initialTags = [] }: TagInputProps) => {
+  const [tags, setTags] = useState<string[]>(initialTags); // Initialize with initialTags
   const [inputValue, setInputValue] = useState("");
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -30,7 +31,9 @@ const TagInput = ({ onTagsChange }: TagInputProps) => {
 
       // Ensure response data is an array of strings
       setSuggestedTags(
-        Array.isArray(response.data) ? response.data.map((tag: { name: string }) => tag.name) : []
+        Array.isArray(response.data)
+          ? response.data.map((tag: { name: string }) => tag.name)
+          : []
       );
     } catch (error) {
       console.error("Error fetching tag suggestions:", error);
@@ -49,7 +52,7 @@ const TagInput = ({ onTagsChange }: TagInputProps) => {
       }
 
       setTags(newTags);
-      onTagsChange(newTags); // ✅ Send updated tags to TiptapEditor
+      onTagsChange(newTags); // Send updated tags to parent
     }
 
     setInputValue(""); // Clear input
@@ -66,7 +69,7 @@ const TagInput = ({ onTagsChange }: TagInputProps) => {
   const removeTag = (index: number) => {
     const newTags = tags.filter((_, i) => i !== index);
     setTags(newTags);
-    onTagsChange(newTags); // ✅ Send updated tags to TiptapEditor
+    onTagsChange(newTags); // Send updated tags to parent
   };
 
   return (

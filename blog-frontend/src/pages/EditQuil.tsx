@@ -11,22 +11,19 @@ import Thumbnail from "./Thumbnail";
 
 Quill.register("modules/imageResize", ImageResize);
 
-export default function QuillEditor() {
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+export default function EditQuillEditor() {
   const [title, setTitle] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [contentType, setContentType] = useState("");
   const [eventLocation, setEventLocation] = useState("");
   const [eventTime, setEventTime] = useState("");
   const [content, setContent] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
-  const [mode, setMode] = useState("DRAFT");
+  const [mode, setMode] = useState<"DRAFT" | "PUBLISHED">("DRAFT");
 
   const location = useLocation();
   const navigate = useNavigate();
-
   const { quill, quillRef } = useQuill({
     modules: {
       toolbar: [
@@ -49,6 +46,16 @@ export default function QuillEditor() {
     },
   });
 
+  // Set up Quill editor content changes
+  useEffect(() => {
+    if (quill) {
+      quill.on("text-change", () => {
+        setContent(quill.root.innerHTML);
+      });
+    }
+  }, [quill]);
+
+  // Load initial content data
   useEffect(() => {
     if (location.state?.content) {
       const { content: contentData } = location.state;
@@ -57,9 +64,10 @@ export default function QuillEditor() {
       setSelectedCategories(contentData.categories);
       setContentType(contentData.type);
       setEventLocation(contentData.location || "");
-      setEventTime(contentData.time || "");
-      setThumbnailUrl(contentData.thumbnail || "");
-      setMode("DRAFT");
+      setEventTime(formatDateTimeLocal(contentData.time));
+      setThumbnailUrl(contentData.thumbnail);
+      setMode(contentData.mode);
+      setContent(contentData.content);
 
       if (quill) {
         quill.clipboard.dangerouslyPasteHTML(contentData.content);
@@ -67,69 +75,25 @@ export default function QuillEditor() {
     }
   }, [location.state, quill]);
 
-  useEffect(() => {
-    if (quill) {
-      quill.on("text-change", () => {
-        const htmlContent = quill.root.innerHTML;
-        setContent(htmlContent);
-      });
-    }
-  }, [quill]);
-
-  const saveDraft = async () => {
-    try {
-      if (quill) {
-        const htmlContent = quill.root.innerHTML;
-        setContent(htmlContent);
-
-        const draft = {
-          title,
-          content: htmlContent,
-          tags: selectedTags,
-          categories: selectedCategories,
-          type: contentType,
-          location: eventLocation,
-          time: eventTime,
-          thumbnail: thumbnailUrl,
-          mode: "DRAFT",
-        };
-
-        if (!draft.title || !draft.content || !draft.type) {
-          console.error("Error: Missing required fields in the draft!");
-          return;
-        }
-
-        await axios.post("http://localhost:5000/contents", draft);
-        alert("Draft saved successfully!");
-      }
-    } catch (error) {
-      console.error("Error saving draft:", error);
-      alert("An error occurred while saving the draft.");
-    }
+  const formatDateTimeLocal = (isoString: string) => {
+    if (!isoString) return "";
+    const date = new Date(isoString);
+    return date.toISOString().slice(0, 16);
   };
 
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-      event.returnValue = "";
-      saveDraft();
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [title, content, selectedTags, selectedCategories, contentType, eventLocation, eventTime, thumbnailUrl]);
-
-  useEffect(() => {
-    return () => {
-      saveDraft();
-    };
-  }, [contentType, thumbnailUrl]);
-  
   const handleSubmit = async () => {
     try {
+      // Validation
+      if (!title || !contentType || !content) {
+        alert("Title, content type, and content are required");
+        return;
+      }
+
+      if (contentType === "EVENTS" && (!eventLocation || !eventTime)) {
+        alert("Location and time are required for events");
+        return;
+      }
+
       const payload = {
         title,
         content,
@@ -137,46 +101,57 @@ export default function QuillEditor() {
         categories: selectedCategories,
         type: contentType,
         location: contentType === "EVENTS" ? eventLocation : undefined,
-        time: contentType === "EVENTS" ? eventTime : undefined,
+        time: contentType === "EVENTS" ? new Date(eventTime).toISOString() : undefined,
         thumbnail: thumbnailUrl,
-        mode: "PUBLISHED",
+        mode:"PUBLISHED"
       };
-      await axios.post("http://localhost:5000/contents", payload);
-      alert("Content saved successfully!");
+
+      await axios.put(
+        `http://localhost:5000/contents/${location.state.content.id}`,
+        payload
+      );
       navigate("/");
     } catch (error) {
-      console.error("Error submitting content:", error);
-      alert("An error occurred while saving content.");
+      console.error("Update error:", error);
+      alert("Error updating content");
     }
   };
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+      {/* Mode Selector */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700">Mode</label>
+        <select
+          value={mode}
+          onChange={(e) => setMode(e.target.value as "DRAFT" | "PUBLISHED")}
+          className="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md"
+        >
+          <option value="DRAFT">Draft</option>
+          <option value="PUBLISHED">Published</option>
+        </select>
+      </div>
+
       <input
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        placeholder="Enter title"
-        className="w-full px-4 py-2 mb-6 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        placeholder="Title"
+        className="w-full px-4 py-2 mb-4 border rounded-lg"
       />
 
-      <div className="mb-6">
-        <label className="block text-lg font-semibold mb-2">
-          Thumbnail Image
-        </label>
-        <Thumbnail
-          onThumbnailUpload={setThumbnailUrl}
-          initialThumbnail={thumbnailUrl}
-        />
-      </div>
+      <Thumbnail
+        onThumbnailUpload={setThumbnailUrl}
+        initialThumbnail={thumbnailUrl}
+      />
 
       <select
         value={contentType}
         onChange={(e) => setContentType(e.target.value)}
-        className="w-full px-4 py-2 mb-6 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full px-4 py-2 mb-4 border rounded-lg"
       >
         <option value="">Select Content Type</option>
-        <option value="EVENTS">Events</option>
+        <option value="EVENTS">Event</option>
         <option value="BLOG">Blog</option>
         <option value="NEWS">News</option>
         <option value="CHARITY">Charity</option>
@@ -184,24 +159,27 @@ export default function QuillEditor() {
       </select>
 
       {contentType === "EVENTS" && (
-        <div className="mb-6">
+        <div className="mb-4">
           <input
             type="text"
             value={eventLocation}
             onChange={(e) => setEventLocation(e.target.value)}
-            placeholder="Event Location"
-            className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Location"
+            className="w-full px-4 py-2 mb-2 border rounded-lg"
           />
           <input
             type="datetime-local"
             value={eventTime}
             onChange={(e) => setEventTime(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg"
           />
         </div>
       )}
 
-      <TagInput onTagsChange={setSelectedTags} initialTags={selectedTags} />
+      <TagInput
+        onTagsChange={setSelectedTags}
+        initialTags={selectedTags}
+      />
 
       <CategoryInput
         onCategoriesChange={setSelectedCategories}
@@ -209,16 +187,16 @@ export default function QuillEditor() {
       />
 
       <div
-        ref={quillRef as React.RefObject<HTMLDivElement>}
-        className="mb-6 border border-gray-300 rounded-lg overflow-hidden"
+        ref={quillRef}
+        className="mb-4 border rounded-lg"
         style={{ height: "400px" }}
       />
 
       <button
         onClick={handleSubmit}
-        className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
       >
-        Submit Content
+        Update Content
       </button>
     </div>
   );

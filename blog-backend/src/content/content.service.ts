@@ -9,6 +9,11 @@ export enum ContentType {
   OTHER = 'OTHER',
 }
 
+export enum ContentMode {
+  DRAFT = 'DRAFT',
+  PUBLISHED = 'PUBLISHED',
+}
+
 @Injectable()
 export class ContentService {
   constructor(private prisma: PrismaService) {}
@@ -22,6 +27,7 @@ export class ContentService {
     location: string,
     time: string,
     thumbnail: string,
+    mode: string,
   ) {
     // Find or create tags
     const tags = await Promise.all(
@@ -62,6 +68,7 @@ export class ContentService {
         location,
         time: validTime,
         thumbnail,
+        mode,
         tags: {
           create: tags.map((tag) => ({
             tag: { connect: { id: tag.id } },
@@ -80,27 +87,133 @@ export class ContentService {
     });
   }
 
-  async getContents() {
+  async getContents(filter?: { mode?: string }) {
     const contents = await this.prisma.content.findMany({
+      where: filter, // Add filter condition here
       include: {
         tags: { include: { tag: true } },
         categories: { include: { category: true } },
       },
     });
 
-    // Transform the result to include only tag and category names
     return contents.map((content) => ({
       id: content.id,
       content: content.content,
-      title: content.title, // Include title in the response
-      type: content.type, // Include type in the response
-      thumbnail: content.thumbnail, // Include thumbnail in the response
-      location: content.location, // Include location (if type is event)
-      time: content.time, // Include time (if type is event)
-      tags: content.tags.map((tagRelation) => tagRelation.tag.name), // Extract only tag names
+      title: content.title,
+      type: content.type,
+      thumbnail: content.thumbnail,
+      location: content.location,
+      mode: content.mode,
+      time: content.time,
+      tags: content.tags.map((tagRelation) => tagRelation.tag.name),
       categories: content.categories.map(
         (categoryRelation) => categoryRelation.category.name,
-      ), // Extract only category names
+      ),
     }));
+  }
+
+  // Update method in ContentService
+  async updateContent(
+    id: string,
+    content: string,
+    tagNames: string[],
+    categoryNames: string[],
+    type: ContentType,
+    title: string,
+    location: string,
+    time: string,
+    thumbnail: string,
+    mode: ContentMode,
+  ) {
+    // Validation
+    if (!content || !title || !type) {
+      throw new Error('Content, title, and type are required');
+    }
+
+    if (type === ContentType.EVENTS && (!location || !time)) {
+      throw new Error('Location and time are required for events');
+    }
+
+    if (!Object.values(ContentMode).includes(mode)) {
+      throw new Error('Invalid content mode');
+    }
+
+    // Transaction for data consistency
+    return this.prisma.$transaction(async (prisma) => {
+      // Handle tags
+      const tags = await Promise.all(
+        tagNames.map((name) =>
+          prisma.tag.upsert({
+            where: { name },
+            update: {},
+            create: { name },
+          }),
+        ),
+      );
+
+      // Handle categories
+      const categories = await Promise.all(
+        categoryNames.map((name) =>
+          prisma.categories.upsert({
+            where: { name },
+            update: {},
+            create: { name },
+          }),
+        ),
+      );
+
+      // Process time
+      const validTime = time ? new Date(time) : null;
+      if (
+        type === ContentType.EVENTS &&
+        (!validTime || isNaN(validTime.getTime()))
+      ) {
+        throw new Error('Valid time is required for events');
+      }
+
+      // Update content with relations
+      const updatedContent = await prisma.content.update({
+        where: { id },
+        data: {
+          content,
+          title,
+          type,
+          location,
+          time: validTime,
+          thumbnail,
+          mode,
+          tags: {
+            deleteMany: {},
+            create: tags.map((tag) => ({
+              tag: { connect: { id: tag.id } },
+            })),
+          },
+          categories: {
+            deleteMany: {},
+            create: categories.map((category) => ({
+              category: { connect: { id: category.id } },
+            })),
+          },
+        },
+        include: {
+          tags: { include: { tag: true } },
+          categories: { include: { category: true } },
+        },
+      });
+
+      // Transform response
+      return {
+        id: updatedContent.id,
+        content: updatedContent.content,
+        title: updatedContent.title,
+        type: updatedContent.type,
+        thumbnail: updatedContent.thumbnail,
+        location: updatedContent.location,
+        mode: updatedContent.mode,
+        time: updatedContent.time,
+        tags: updatedContent.tags.map((tr) => tr.tag.name),
+        categories: updatedContent.categories.map((cr) => cr.category.name),
+      };
+    });
   }
 }

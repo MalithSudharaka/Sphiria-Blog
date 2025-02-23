@@ -12,7 +12,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContentController = exports.ContentType = void 0;
+exports.ContentController = exports.ContentMode = exports.ContentType = void 0;
 const common_1 = require("@nestjs/common");
 const content_service_1 = require("./content.service");
 var ContentType;
@@ -23,11 +23,16 @@ var ContentType;
     ContentType["CHARITY"] = "CHARITY";
     ContentType["OTHER"] = "OTHER";
 })(ContentType || (exports.ContentType = ContentType = {}));
+var ContentMode;
+(function (ContentMode) {
+    ContentMode["DRAFT"] = "DRAFT";
+    ContentMode["PUBLISHED"] = "PUBLISHED";
+})(ContentMode || (exports.ContentMode = ContentMode = {}));
 let ContentController = class ContentController {
     constructor(contentService) {
         this.contentService = contentService;
     }
-    async saveContent(content, title, type, tags, categories, location, time, thumbnail, res) {
+    async saveContent(content, title, type, tags, categories, location, time, thumbnail, mode, res) {
         if (!content || !title || !type) {
             return res.status(common_1.HttpStatus.BAD_REQUEST).json({
                 error: 'Content, title, and type are required',
@@ -38,15 +43,30 @@ let ContentController = class ContentController {
                 error: 'Location and time are required for events',
             });
         }
-        const savedContent = await this.contentService.saveContent(content, tags, categories, type, title, location, time, thumbnail);
+        const savedContent = await this.contentService.saveContent(content, tags, categories, type, title, location, time, thumbnail, mode);
         return res.status(common_1.HttpStatus.CREATED).json({
             message: 'Content saved successfully!',
             data: savedContent,
         });
     }
-    async getContents(res) {
-        const contents = await this.contentService.getContents();
+    async getContents(mode, res) {
+        const filter = mode ? { mode } : {};
+        const contents = await this.contentService.getContents(filter);
         return res.status(common_1.HttpStatus.OK).json(contents);
+    }
+    async updateContent(id, body, res) {
+        try {
+            const updatedContent = await this.contentService.updateContent(id, body.content, body.tags, body.categories, body.type, body.title, body.location, body.time, body.thumbnail, body.mode);
+            return res.status(common_1.HttpStatus.OK).json({
+                message: 'Content updated successfully',
+                data: updatedContent
+            });
+        }
+        catch (error) {
+            return res.status(common_1.HttpStatus.BAD_REQUEST).json({
+                error: error.message
+            });
+        }
     }
 };
 exports.ContentController = ContentController;
@@ -61,18 +81,29 @@ __decorate([
     __param(5, (0, common_1.Body)('location')),
     __param(6, (0, common_1.Body)('time')),
     __param(7, (0, common_1.Body)('thumbnail')),
-    __param(8, (0, common_1.Res)()),
+    __param(8, (0, common_1.Body)('mode')),
+    __param(9, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, Array, Array, String, String, String, Object]),
+    __metadata("design:paramtypes", [String, String, String, Array, Array, String, String, String, String, Object]),
     __metadata("design:returntype", Promise)
 ], ContentController.prototype, "saveContent", null);
 __decorate([
     (0, common_1.Get)(),
-    __param(0, (0, common_1.Res)()),
+    __param(0, (0, common_1.Query)('mode')),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ContentController.prototype, "getContents", null);
+__decorate([
+    (0, common_1.Put)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], ContentController.prototype, "updateContent", null);
 exports.ContentController = ContentController = __decorate([
     (0, common_1.Controller)('contents'),
     __metadata("design:paramtypes", [content_service_1.ContentService])

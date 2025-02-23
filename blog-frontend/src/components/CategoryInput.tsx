@@ -3,12 +3,13 @@ import axios from "axios";
 
 interface CategoryInputProps {
   onCategoriesChange: (categories: string[]) => void;
+  initialCategories?: string[]; // Add initialCategories prop
 }
 
-const CategoryInput = ({ onCategoriesChange }: CategoryInputProps) => {
+const CategoryInput = ({ onCategoriesChange, initialCategories = [] }: CategoryInputProps) => {
   const [categories, setCategories] = useState<string[]>([]);
   const [filteredCategories, setFilteredCategories] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategories); // Initialize with initialCategories
   const [inputValue, setInputValue] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -65,12 +66,12 @@ const CategoryInput = ({ onCategoriesChange }: CategoryInputProps) => {
         {selectedCategories.map((category, index) => (
           <span
             key={index}
-            className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+            className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
           >
             {category}
             <button
               onClick={() => handleRemoveCategory(category)}
-              className="ml-2 text-blue-800 hover:text-blue-900 focus:outline-none"
+              className="ml-2 text-green-800 hover:text-green-900 focus:outline-none"
             >
               ✖
             </button>

@@ -42,6 +42,7 @@ export declare class CategoriesController {
         thumbnail: string | null;
         location: string | null;
         time: Date | null;
+        mode: string;
     }>;
     getCategoriesForContent(contentId: string): Promise<({
         categories: {
@@ -61,5 +62,6 @@ export declare class CategoriesController {
         thumbnail: string | null;
         location: string | null;
         time: Date | null;
+        mode: string;
     }) | null>;
 }

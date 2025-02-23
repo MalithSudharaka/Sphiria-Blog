@@ -6,9 +6,24 @@ export declare enum ContentType {
     CHARITY = "CHARITY",
     OTHER = "OTHER"
 }
+export declare enum ContentMode {
+    DRAFT = "DRAFT",
+    PUBLISHED = "PUBLISHED"
+}
 export declare class ContentController {
     private readonly contentService;
     constructor(contentService: ContentService);
-    saveContent(content: string, title: string, type: ContentType, tags: string[], categories: string[], location: string, time: string, thumbnail: string, res: any): Promise<any>;
-    getContents(res: any): Promise<any>;
+    saveContent(content: string, title: string, type: ContentType, tags: string[], categories: string[], location: string, time: string, thumbnail: string, mode: string, res: any): Promise<any>;
+    getContents(mode: string, res: any): Promise<any>;
+    updateContent(id: string, body: {
+        content: string;
+        title: string;
+        type: ContentType;
+        tags: string[];
+        categories: string[];
+        location: string;
+        time: string;
+        thumbnail: string;
+        mode: ContentMode;
+    }, res: any): Promise<any>;
 }

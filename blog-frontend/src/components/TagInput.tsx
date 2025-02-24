@@ -4,9 +4,10 @@ import axios from "axios";
 interface TagInputProps {
   onTagsChange: (tags: string[]) => void;
   initialTags?: string[]; // Add initialTags prop
+  placeholder:string
 }
 
-const TagInput = ({ onTagsChange, initialTags = [] }: TagInputProps) => {
+const TagInput = ({ onTagsChange, initialTags = [],placeholder }: TagInputProps) => {
   const [tags, setTags] = useState<string[]>(initialTags); // Initialize with initialTags
   const [inputValue, setInputValue] = useState("");
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
@@ -80,7 +81,7 @@ const TagInput = ({ onTagsChange, initialTags = [] }: TagInputProps) => {
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Add a tag and press Enter..."
+        placeholder={placeholder}
         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 

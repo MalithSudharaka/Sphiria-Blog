@@ -199,6 +199,7 @@ export default function EditQuillEditor() {
       <TagInput
         onTagsChange={setSelectedTags}
         initialTags={selectedTags}
+        placeholder="Add keywords (press Enter)"
       />
 
       <CategoryInput
@@ -246,7 +247,7 @@ export default function EditQuillEditor() {
             onTagsChange={setMetaKeywords}
             initialTags={metaKeywords}
             placeholder="Add keywords (press Enter)"
-            maxTags={10}
+            // maxTags={10}
           />
           <p className="text-sm text-gray-500 mt-1">
             {metaKeywords.length}/10 keywords

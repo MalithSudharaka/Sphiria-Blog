@@ -18,14 +18,17 @@ const tags_module_1 = require("./tags/tags.module");
 const categories_service_1 = require("./categories/categories.service");
 const categories_controller_1 = require("./categories/categories.controller");
 const categories_module_1 = require("./categories/categories.module");
+const meta_settings_service_1 = require("./meta-settings/meta-settings.service");
+const meta_settings_controller_1 = require("./meta-settings/meta-settings.controller");
+const meta_settings_module_1 = require("./meta-settings/meta-settings.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [content_module_1.ContentModule, tags_module_1.TagsModule, categories_module_1.CategoriesModule],
-        controllers: [app_controller_1.AppController, tags_controller_1.TagsController, categories_controller_1.CategoriesController],
-        providers: [app_service_1.AppService, prisma_service_1.PrismaService, tags_service_1.TagsService, categories_service_1.CategoriesService],
+        imports: [content_module_1.ContentModule, tags_module_1.TagsModule, categories_module_1.CategoriesModule, meta_settings_module_1.MetaSettingsModule],
+        controllers: [app_controller_1.AppController, tags_controller_1.TagsController, categories_controller_1.CategoriesController, meta_settings_controller_1.MetaSettingsController],
+        providers: [app_service_1.AppService, prisma_service_1.PrismaService, tags_service_1.TagsService, categories_service_1.CategoriesService, meta_settings_service_1.MetaSettingsService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

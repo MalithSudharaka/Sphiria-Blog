@@ -32,22 +32,21 @@ model Content {
   title      String?
   type       ContentType?
   thumbnail  String?
-  
+
   // SEO Fields
-   seoTitle        String?       // Add this
-  metaDescription String?       // Add this
-  metaKeywords    String[]      // Add this
-  
+  seoTitle        String? // Add this
+  metaDescription String? // Add this
+  metaKeywords    String[] // Add this
+
   // Event-specific fields
   location String?
   time     DateTime?
-  mode     String @default("DRAFT")
-  
+  mode     String    @default("DRAFT")
+
   // Relations
   @@index([createdAt])
   @@index([type])
 }
-
 
 model Categories {
   id        String            @id @default(auto()) @map("_id") @db.ObjectId
@@ -89,4 +88,13 @@ model ContentTag {
   updatedAt DateTime @updatedAt
 
   @@unique([contentId, tagId]) // Ensure unique pairs of content and tag
+}
+
+model MetaSettings {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  title             String
+  metaKeyword       String
+  metaDescription   String
+  googleAnalyticsId String
+  defaultImage      String?
 }

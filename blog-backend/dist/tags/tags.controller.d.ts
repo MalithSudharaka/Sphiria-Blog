@@ -3,8 +3,8 @@ export declare class TagsController {
     private readonly tagService;
     constructor(tagService: TagsService);
     findAll(): Promise<{
-        name: string;
         id: string;
+        name: string;
         createdAt: Date;
         updatedAt: Date;
     }[]>;

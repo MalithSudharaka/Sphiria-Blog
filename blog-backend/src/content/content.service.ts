@@ -28,6 +28,9 @@ export class ContentService {
     time: string,
     thumbnail: string,
     mode: string,
+    seoTitle: string,          // Add this parameter
+    metaDescription: string,   // Add this parameter
+    metaKeywords: string[], 
   ) {
     // Find or create tags
     const tags = await Promise.all(
@@ -69,6 +72,9 @@ export class ContentService {
         time: validTime,
         thumbnail,
         mode,
+        seoTitle,          // Add this
+        metaDescription,   // Add this
+        metaKeywords,      // Add this
         tags: {
           create: tags.map((tag) => ({
             tag: { connect: { id: tag.id } },
@@ -105,6 +111,9 @@ export class ContentService {
       location: content.location,
       mode: content.mode,
       time: content.time,
+      seoTitle: content.seoTitle,          // Add this
+      metaDescription: content.metaDescription, // Add this
+      metaKeywords: content.metaKeywords,  // Add this
       tags: content.tags.map((tagRelation) => tagRelation.tag.name),
       categories: content.categories.map(
         (categoryRelation) => categoryRelation.category.name,
@@ -124,6 +133,9 @@ export class ContentService {
     time: string,
     thumbnail: string,
     mode: ContentMode,
+    seoTitle: string,          // Add this parameter
+    metaDescription: string,   // Add this parameter
+    metaKeywords: string[],    // Add this parameter
   ) {
     // Validation
     if (!content || !title || !type) {
@@ -182,6 +194,9 @@ export class ContentService {
           time: validTime,
           thumbnail,
           mode,
+          seoTitle,          // Add this
+          metaDescription,   // Add this
+          metaKeywords,     // Add this
           tags: {
             deleteMany: {},
             create: tags.map((tag) => ({
@@ -211,6 +226,9 @@ export class ContentService {
         location: updatedContent.location,
         mode: updatedContent.mode,
         time: updatedContent.time,
+        seoTitle: updatedContent.seoTitle,          // Add this
+        metaDescription: updatedContent.metaDescription, // Add this
+        metaKeywords: updatedContent.metaKeywords,  // Add this
         tags: updatedContent.tags.map((tr) => tr.tag.name),
         categories: updatedContent.categories.map((cr) => cr.category.name),
       };

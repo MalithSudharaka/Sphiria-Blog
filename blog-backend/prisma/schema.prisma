@@ -25,18 +25,27 @@ enum ContentMode {
 model Content {
   id         String            @id @default(auto()) @map("_id") @db.ObjectId
   content    String
-  categories ContentCategory[] // Relation to the join collection
-  tags       ContentTag[] // Relation to the join collection
+  categories ContentCategory[]
+  tags       ContentTag[]
   createdAt  DateTime          @default(now())
   updatedAt  DateTime          @updatedAt
   title      String?
   type       ContentType?
   thumbnail  String?
-
+  
+  // SEO Fields
+   seoTitle        String?       // Add this
+  metaDescription String?       // Add this
+  metaKeywords    String[]      // Add this
+  
   // Event-specific fields
-  location String? // Optional field for location, required for events
-  time     DateTime? // Optional field for event start time, required for events
-  mode     String @default("DRAFT") 
+  location String?
+  time     DateTime?
+  mode     String @default("DRAFT")
+  
+  // Relations
+  @@index([createdAt])
+  @@index([type])
 }
 
 

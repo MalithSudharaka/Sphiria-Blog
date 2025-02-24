@@ -21,6 +21,9 @@ export default function EditQuillEditor() {
   const [content, setContent] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [mode, setMode] = useState<"DRAFT" | "PUBLISHED">("DRAFT");
+  const [seoTitle, setSeoTitle] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+  const [metaKeywords, setMetaKeywords] = useState<string[]>([]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -46,7 +49,6 @@ export default function EditQuillEditor() {
     },
   });
 
-  // Set up Quill editor content changes
   useEffect(() => {
     if (quill) {
       quill.on("text-change", () => {
@@ -55,7 +57,6 @@ export default function EditQuillEditor() {
     }
   }, [quill]);
 
-  // Load initial content data
   useEffect(() => {
     if (location.state?.content) {
       const { content: contentData } = location.state;
@@ -68,6 +69,9 @@ export default function EditQuillEditor() {
       setThumbnailUrl(contentData.thumbnail);
       setMode(contentData.mode);
       setContent(contentData.content);
+      setSeoTitle(contentData.seoTitle || "");
+      setMetaDescription(contentData.metaDescription || "");
+      setMetaKeywords(contentData.metaKeywords || []);
 
       if (quill) {
         quill.clipboard.dangerouslyPasteHTML(contentData.content);
@@ -83,7 +87,6 @@ export default function EditQuillEditor() {
 
   const handleSubmit = async () => {
     try {
-      // Validation
       if (!title || !contentType || !content) {
         alert("Title, content type, and content are required");
         return;
@@ -91,6 +94,21 @@ export default function EditQuillEditor() {
 
       if (contentType === "EVENTS" && (!eventLocation || !eventTime)) {
         alert("Location and time are required for events");
+        return;
+      }
+
+      if (seoTitle.length > 60) {
+        alert("SEO Title must be 60 characters or less");
+        return;
+      }
+
+      if (metaDescription.length > 160) {
+        alert("Meta Description must be 160 characters or less");
+        return;
+      }
+
+      if (metaKeywords.length > 10) {
+        alert("Maximum 10 meta keywords allowed");
         return;
       }
 
@@ -103,7 +121,10 @@ export default function EditQuillEditor() {
         location: contentType === "EVENTS" ? eventLocation : undefined,
         time: contentType === "EVENTS" ? new Date(eventTime).toISOString() : undefined,
         thumbnail: thumbnailUrl,
-        mode:"PUBLISHED"
+        mode,
+        seoTitle,
+        metaDescription,
+        metaKeywords
       };
 
       await axios.put(
@@ -119,7 +140,6 @@ export default function EditQuillEditor() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-      {/* Mode Selector */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">Mode</label>
         <select
@@ -185,6 +205,54 @@ export default function EditQuillEditor() {
         onCategoriesChange={setSelectedCategories}
         initialCategories={selectedCategories}
       />
+
+      <div className="mb-6 space-y-4">
+        <h3 className="text-lg font-semibold mb-2">SEO Settings</h3>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">SEO Title</label>
+          <input
+            type="text"
+            value={seoTitle}
+            onChange={(e) => setSeoTitle(e.target.value)}
+            placeholder="SEO Title"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            maxLength={60}
+          />
+          <p className="text-sm text-gray-500 mt-1">
+            {seoTitle.length}/60 characters
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Meta Description</label>
+          <textarea
+            value={metaDescription}
+            onChange={(e) => setMetaDescription(e.target.value)}
+            placeholder="Meta Description"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            rows={3}
+            maxLength={160}
+          />
+          <p className="text-sm text-gray-500 mt-1">
+            {metaDescription.length}/160 characters
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Meta Keywords</label>
+          <TagInput
+            key={metaKeywords.join(',')}
+            onTagsChange={setMetaKeywords}
+            initialTags={metaKeywords}
+            placeholder="Add keywords (press Enter)"
+            maxTags={10}
+          />
+          <p className="text-sm text-gray-500 mt-1">
+            {metaKeywords.length}/10 keywords
+          </p>
+        </div>
+      </div>
 
       <div
         ref={quillRef}

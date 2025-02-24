@@ -29,7 +29,7 @@ let ContentService = class ContentService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async saveContent(content, tagNames, categoryNames, type, title, location, time, thumbnail, mode) {
+    async saveContent(content, tagNames, categoryNames, type, title, location, time, thumbnail, mode, seoTitle, metaDescription, metaKeywords) {
         const tags = await Promise.all(tagNames.map(async (name) => this.prisma.tag.upsert({
             where: { name },
             update: {},
@@ -56,6 +56,9 @@ let ContentService = class ContentService {
                 time: validTime,
                 thumbnail,
                 mode,
+                seoTitle,
+                metaDescription,
+                metaKeywords,
                 tags: {
                     create: tags.map((tag) => ({
                         tag: { connect: { id: tag.id } },
@@ -90,11 +93,14 @@ let ContentService = class ContentService {
             location: content.location,
             mode: content.mode,
             time: content.time,
+            seoTitle: content.seoTitle,
+            metaDescription: content.metaDescription,
+            metaKeywords: content.metaKeywords,
             tags: content.tags.map((tagRelation) => tagRelation.tag.name),
             categories: content.categories.map((categoryRelation) => categoryRelation.category.name),
         }));
     }
-    async updateContent(id, content, tagNames, categoryNames, type, title, location, time, thumbnail, mode) {
+    async updateContent(id, content, tagNames, categoryNames, type, title, location, time, thumbnail, mode, seoTitle, metaDescription, metaKeywords) {
         if (!content || !title || !type) {
             throw new Error('Content, title, and type are required');
         }
@@ -130,6 +136,9 @@ let ContentService = class ContentService {
                     time: validTime,
                     thumbnail,
                     mode,
+                    seoTitle,
+                    metaDescription,
+                    metaKeywords,
                     tags: {
                         deleteMany: {},
                         create: tags.map((tag) => ({
@@ -157,6 +166,9 @@ let ContentService = class ContentService {
                 location: updatedContent.location,
                 mode: updatedContent.mode,
                 time: updatedContent.time,
+                seoTitle: updatedContent.seoTitle,
+                metaDescription: updatedContent.metaDescription,
+                metaKeywords: updatedContent.metaKeywords,
                 tags: updatedContent.tags.map((tr) => tr.tag.name),
                 categories: updatedContent.categories.map((cr) => cr.category.name),
             };

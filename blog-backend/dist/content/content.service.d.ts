@@ -13,43 +13,46 @@ export declare enum ContentMode {
 export declare class ContentService {
     private prisma;
     constructor(prisma: PrismaService);
-    saveContent(content: string, tagNames: string[], categoryNames: string[], type: ContentType, title: string, location: string, time: string, thumbnail: string, mode: string): Promise<{
+    saveContent(content: string, tagNames: string[], categoryNames: string[], type: ContentType, title: string, location: string, time: string, thumbnail: string, mode: string, seoTitle: string, metaDescription: string, metaKeywords: string[]): Promise<{
         categories: ({
             category: {
                 id: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
             };
         } & {
             id: string;
+            contentId: string;
+            categoryId: string;
             createdAt: Date;
             updatedAt: Date;
-            categoryId: string;
-            contentId: string;
         })[];
         tags: ({
             tag: {
                 id: string;
+                name: string;
                 createdAt: Date;
                 updatedAt: Date;
-                name: string;
             };
         } & {
             id: string;
+            contentId: string;
+            tagId: string;
             createdAt: Date;
             updatedAt: Date;
-            tagId: string;
-            contentId: string;
         })[];
     } & {
-        content: string;
         id: string;
+        content: string;
         createdAt: Date;
         updatedAt: Date;
         title: string | null;
         type: import(".prisma/client").$Enums.ContentType | null;
         thumbnail: string | null;
+        seoTitle: string | null;
+        metaDescription: string | null;
+        metaKeywords: string[];
         location: string | null;
         time: Date | null;
         mode: string;
@@ -65,10 +68,13 @@ export declare class ContentService {
         location: string | null;
         mode: string;
         time: Date | null;
+        seoTitle: string | null;
+        metaDescription: string | null;
+        metaKeywords: string[];
         tags: string[];
         categories: string[];
     }[]>;
-    updateContent(id: string, content: string, tagNames: string[], categoryNames: string[], type: ContentType, title: string, location: string, time: string, thumbnail: string, mode: ContentMode): Promise<{
+    updateContent(id: string, content: string, tagNames: string[], categoryNames: string[], type: ContentType, title: string, location: string, time: string, thumbnail: string, mode: ContentMode, seoTitle: string, metaDescription: string, metaKeywords: string[]): Promise<{
         id: string;
         content: string;
         title: string | null;
@@ -77,6 +83,9 @@ export declare class ContentService {
         location: string | null;
         mode: string;
         time: Date | null;
+        seoTitle: string | null;
+        metaDescription: string | null;
+        metaKeywords: string[];
         tags: string[];
         categories: string[];
     }>;

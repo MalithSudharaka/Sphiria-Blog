@@ -12,59 +12,63 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContentController = exports.ContentMode = exports.ContentType = void 0;
+exports.ContentController = void 0;
 const common_1 = require("@nestjs/common");
 const content_service_1 = require("./content.service");
-var ContentType;
-(function (ContentType) {
-    ContentType["EVENTS"] = "EVENTS";
-    ContentType["BLOG"] = "BLOG";
-    ContentType["NEWS"] = "NEWS";
-    ContentType["CHARITY"] = "CHARITY";
-    ContentType["OTHER"] = "OTHER";
-})(ContentType || (exports.ContentType = ContentType = {}));
-var ContentMode;
-(function (ContentMode) {
-    ContentMode["DRAFT"] = "DRAFT";
-    ContentMode["PUBLISHED"] = "PUBLISHED";
-})(ContentMode || (exports.ContentMode = ContentMode = {}));
 let ContentController = class ContentController {
     constructor(contentService) {
         this.contentService = contentService;
     }
-    async saveContent(content, title, type, tags, categories, location, time, thumbnail, mode, res) {
-        if (!content || !title || !type) {
+    async createContent(body, res) {
+        if (!body.content || !body.title || !body.type) {
             return res.status(common_1.HttpStatus.BAD_REQUEST).json({
                 error: 'Content, title, and type are required',
             });
         }
-        if (type === ContentType.EVENTS && (!location || !time)) {
+        if (body.type === content_service_1.ContentType.EVENTS && (!body.location || !body.time)) {
             return res.status(common_1.HttpStatus.BAD_REQUEST).json({
                 error: 'Location and time are required for events',
             });
         }
-        const savedContent = await this.contentService.saveContent(content, tags, categories, type, title, location, time, thumbnail, mode);
-        return res.status(common_1.HttpStatus.CREATED).json({
-            message: 'Content saved successfully!',
-            data: savedContent,
-        });
-    }
-    async getContents(mode, res) {
-        const filter = mode ? { mode } : {};
-        const contents = await this.contentService.getContents(filter);
-        return res.status(common_1.HttpStatus.OK).json(contents);
-    }
-    async updateContent(id, body, res) {
         try {
-            const updatedContent = await this.contentService.updateContent(id, body.content, body.tags, body.categories, body.type, body.title, body.location, body.time, body.thumbnail, body.mode);
-            return res.status(common_1.HttpStatus.OK).json({
-                message: 'Content updated successfully',
-                data: updatedContent
+            const savedContent = await this.contentService.saveContent(body.content, body.tags, body.categories, body.type, body.title, body.location || '', body.time || '', body.thumbnail || '', body.mode, body.seoTitle, body.metaDescription, body.metaKeywords);
+            return res.status(common_1.HttpStatus.CREATED).json({
+                message: 'Content saved successfully!',
+                data: savedContent,
             });
         }
         catch (error) {
-            return res.status(common_1.HttpStatus.BAD_REQUEST).json({
-                error: error.message
+            return res.status(common_1.HttpStatus.INTERNAL_SERVER_ERROR).json({
+                error: error.message,
+            });
+        }
+    }
+    async getContents(mode, res) {
+        try {
+            const filter = mode ? { mode } : {};
+            const contents = await this.contentService.getContents(filter);
+            return res.status(common_1.HttpStatus.OK).json(contents);
+        }
+        catch (error) {
+            return res.status(common_1.HttpStatus.INTERNAL_SERVER_ERROR).json({
+                error: error.message,
+            });
+        }
+    }
+    async updateContent(id, body, res) {
+        try {
+            const updatedContent = await this.contentService.updateContent(id, body.content, body.tags, body.categories, body.type, body.title, body.location || '', body.time || '', body.thumbnail || '', body.mode, body.seoTitle, body.metaDescription, body.metaKeywords);
+            return res.status(common_1.HttpStatus.OK).json({
+                message: 'Content updated successfully',
+                data: updatedContent,
+            });
+        }
+        catch (error) {
+            const status = error.message.includes('not found')
+                ? common_1.HttpStatus.NOT_FOUND
+                : common_1.HttpStatus.BAD_REQUEST;
+            return res.status(status).json({
+                error: error.message,
             });
         }
     }
@@ -72,21 +76,12 @@ let ContentController = class ContentController {
 exports.ContentController = ContentController;
 __decorate([
     (0, common_1.Post)(),
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)('content')),
-    __param(1, (0, common_1.Body)('title')),
-    __param(2, (0, common_1.Body)('type')),
-    __param(3, (0, common_1.Body)('tags')),
-    __param(4, (0, common_1.Body)('categories')),
-    __param(5, (0, common_1.Body)('location')),
-    __param(6, (0, common_1.Body)('time')),
-    __param(7, (0, common_1.Body)('thumbnail')),
-    __param(8, (0, common_1.Body)('mode')),
-    __param(9, (0, common_1.Res)()),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String, Array, Array, String, String, String, String, Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
-], ContentController.prototype, "saveContent", null);
+], ContentController.prototype, "createContent", null);
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Query)('mode')),

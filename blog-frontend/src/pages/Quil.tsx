@@ -24,6 +24,10 @@ export default function QuillEditor() {
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [mode, setMode] = useState("DRAFT");
 
+  const [seoTitle, setSeoTitle] = useState("");
+  const [metaDescription, setMetaDescription] = useState("");
+  const [metaKeywords, setMetaKeywords] = useState<string[]>([]);
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -61,6 +65,10 @@ export default function QuillEditor() {
       setThumbnailUrl(contentData.thumbnail || "");
       setMode("DRAFT");
 
+      setSeoTitle(contentData.seoTitle || "");
+      setMetaDescription(contentData.metaDescription || "");
+      setMetaKeywords(contentData.metaKeywords || []);
+
       if (quill) {
         quill.clipboard.dangerouslyPasteHTML(contentData.content);
       }
@@ -92,6 +100,10 @@ export default function QuillEditor() {
           time: eventTime,
           thumbnail: thumbnailUrl,
           mode: "DRAFT",
+
+          seoTitle,
+          metaDescription,
+          metaKeywords,
         };
 
         if (!draft.title || !draft.content || !draft.type) {
@@ -120,14 +132,23 @@ export default function QuillEditor() {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [title, content, selectedTags, selectedCategories, contentType, eventLocation, eventTime, thumbnailUrl]);
+  }, [
+    title,
+    content,
+    selectedTags,
+    selectedCategories,
+    contentType,
+    eventLocation,
+    eventTime,
+    thumbnailUrl,
+  ]);
 
   useEffect(() => {
     return () => {
       saveDraft();
     };
   }, [contentType, thumbnailUrl]);
-  
+
   const handleSubmit = async () => {
     try {
       const payload = {
@@ -140,6 +161,10 @@ export default function QuillEditor() {
         time: contentType === "EVENTS" ? eventTime : undefined,
         thumbnail: thumbnailUrl,
         mode: "PUBLISHED",
+
+        seoTitle,
+        metaDescription,
+        metaKeywords,
       };
       await axios.post("http://localhost:5000/contents", payload);
       alert("Content saved successfully!");
@@ -213,6 +238,38 @@ export default function QuillEditor() {
         className="mb-6 border border-gray-300 rounded-lg overflow-hidden"
         style={{ height: "400px" }}
       />
+
+      <div className="mb-6 space-y-4">
+        <h3 className="text-lg font-semibold">SEO Settings</h3>
+
+        {/* SEO Title */}
+        <input
+          type="text"
+          value={seoTitle}
+          onChange={(e) => setSeoTitle(e.target.value)}
+          placeholder="SEO Title"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        {/* Meta Description */}
+        <textarea
+          value={metaDescription}
+          onChange={(e) => setMetaDescription(e.target.value)}
+          placeholder="Meta Description"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          rows={3}
+        />
+
+        {/* Meta Keywords */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Meta Keywords</label>
+          <TagInput
+            onTagsChange={setMetaKeywords}
+            initialTags={metaKeywords}
+            placeholder="Add keywords (press Enter)"
+          />
+        </div>
+      </div>
 
       <button
         onClick={handleSubmit}

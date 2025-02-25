@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
+import { useState } from 'react';
 
 const metaSettingsSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -14,13 +15,37 @@ const metaSettingsSchema = z.object({
 type MetaSettingsFormData = z.infer<typeof metaSettingsSchema>;
 
 const MetaSettingsForm = () => {
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string>('');
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<MetaSettingsFormData>({
     resolver: zodResolver(metaSettingsSchema),
   });
+
+  const uploadImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'blog-post'); // Replace with your Cloudinary upload preset
+
+    try {
+      setImageUploading(true);
+      const response = await axios.post('https://api.cloudinary.com/v1_1/dwvrjfdpu/image/upload', formData);
+      setImageUrl(response.data.secure_url);
+      setValue('defaultImage', response.data.secure_url);
+      setImageUploading(false);
+    } catch (error) {
+      alert('Image upload failed');
+      setImageUploading(false);
+    }
+  };
 
   const onSubmit = async (data: MetaSettingsFormData) => {
     try {
@@ -76,12 +101,15 @@ const MetaSettingsForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Default Image URL</label>
+          <label className="block text-sm font-medium text-gray-700">Upload Default Image</label>
           <input
-            {...register('defaultImage')}
+            type="file"
+            accept="image/*"
+            onChange={uploadImage}
             className="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            placeholder="Enter default image URL"
           />
+          {imageUploading && <p className="text-blue-500 text-sm mt-1">Uploading image...</p>}
+          {imageUrl && <img src={imageUrl} alt="Uploaded" className="mt-4 w-32 h-32 object-cover rounded-lg" />}
         </div>
 
         <button

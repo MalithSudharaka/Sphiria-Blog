@@ -147,7 +147,7 @@ export default function QuillEditor() {
     return () => {
       saveDraft();
     };
-  }, [contentType, thumbnailUrl]);
+  }, [contentType]);
 
   const handleSubmit = async () => {
     try {

@@ -23,7 +23,6 @@ export default function QuillEditor() {
   const [content, setContent] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [mode, setMode] = useState<"DRAFT" | "PUBLISHED">("DRAFT");
-
   const [seoTitle, setSeoTitle] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
   const [metaKeywords, setMetaKeywords] = useState<string[]>([]);
@@ -51,6 +50,29 @@ export default function QuillEditor() {
         modules: ["Resize", "DisplaySize"],
       },
     },
+    formats: [
+      "header",
+      "bold",
+      "italic",
+      "underline",
+      "strike",
+      "blockquote",
+      "list",
+      "bullet",
+      "indent",
+      "link",
+      "image",
+      "video",
+      "color",
+      "script",
+      "size",
+      "font",
+      "background",
+      "align",
+      "direction",
+      "code-block",
+      "code"
+    ]
   });
 
   useEffect(() => {
@@ -64,7 +86,6 @@ export default function QuillEditor() {
       setEventTime(contentData.time || "");
       setThumbnailUrl(contentData.thumbnail || "");
       setMode(contentData.mode || "DRAFT");
-
       setSeoTitle(contentData.seoTitle || "");
       setMetaDescription(contentData.metaDescription || "");
       setMetaKeywords(contentData.metaKeywords || []);
@@ -142,12 +163,6 @@ export default function QuillEditor() {
     thumbnailUrl,
     mode,
   ]);
-
-  useEffect(() => {
-    return () => {
-      saveDraft();
-    };
-  }, [contentType]);
 
   const handleSubmit = async () => {
     try {

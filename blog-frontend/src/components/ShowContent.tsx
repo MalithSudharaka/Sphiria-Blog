@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // For navigation
+import "quill/dist/quill.snow.css";
 
 interface ContentItem {
   id: string;
@@ -86,7 +87,7 @@ const ShowContent: React.FC = () => {
 
             {/* Content */}
             <div
-              className="prose max-w-none text-gray-800 break-words"
+               className="ql-editor max-w-none text-gray-800 break-words"
               dangerouslySetInnerHTML={{ __html: item.content }}
             />
 
